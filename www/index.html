@@ -24,27 +24,41 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 
     <title>DAW</title>
+
+    <script type="text/javascript"
+            src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBvTh7BHElsehNXdZNBx3SRNRA9vwhcrp4&sensor=true"></script>
+
+
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/M03_mapes.js"></script>
     <script type="text/javascript">
         app.initialize();
     </script>
+    <style type="text/css">
+        html { height: 100% }
+        body { height: 100%; margin: 0; padding: 0 }
+        #mapa { height: 50%; width: 100%; }
+    </style>
 </head>
 <body>
+<header class="bar bar-nav">
+    <a class="icon icon-left-nav pull-left" href="index.html"></a>
+    <a class="icon icon-compose pull-right"></a>
 
 
-<div class="container">
+</header>
 
-    <div class="starter-template">
-        <h1>PhoneGAP</h1>
-        <p class="lead">Selecciona el exercici que vols veure</p>
-    </div>
-    <a href="M01_accelerometre.html" class="btn btn-info" role="button">Accelerometre</a>
-    <a href="M02_geolocalitzacio.html" class="btn btn-info" role="button">Geo</a>
-    <a href="M03_mapes.html" class="btn btn-info" role="button">Mapes</a>
-    <a href="M04_fitxers.html" class="btn btn-info" role="button">Fitxers</a>
-    <a href="M05_fitxersLocal.html" class="btn btn-info" role="button">Fitxers Local</a>
-    <a href="M06_baseDades.html" class="btn btn-info" role="button">Base de dades</a>
+<div id="mapa"></div>
+
+<div class="content">
+
+    <input type="text"  id="accio" />
+    <input type="button" id="desa" value="Desa" />
+    <div id="missatge"></div>
+    <div id="llista"></div>
+
 </div>
+
 </body>
 </html>
