@@ -32,22 +32,24 @@ var app = {
 
         db = app.obtenirBaseDades();
         db.transaction(function (tx) {
-            tx.executeSql('CREATE TABLE IF NOT EXISTS RESTAURANTS(id INTEGER PRIMARY KEY AUTOINCREMENT, nom STRING, tipus STRING, img STRING)');
-        }, app.error, app.obtenirItems);
-        document.getElementById('desa').addEventListener('click', function (e) {
-            app.desar();
-        });
-
-
+            tx.executeSql('CREATE TABLE IF NOT EXISTS RESTAURANTS' +
+                            '(id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
+                            'nom, tipus, lat, long, img)');
+        }, app.error, app.desar,app.obtenirItems);
+        //document.getElementById('desa').addEventListener('click', function (e) {
+        //    app.desar();
+        //});
     },
 
     obtenirBaseDades: function () {
         return window.openDatabase("llistaBD", "1.0", "Llista BD", 200000);
     },
     desar: function () {
-        var valor = document.getElementById('accio').value;
+        //var valor = document.getElementById('accio').value;
         db.transaction(function (tx) {
-            tx.executeSql('INSERT INTO LLISTA (accio) VALUES ("' + valor + '")');
+            tx.executeSql('DELETE FROM RESTAURANTS');
+            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, lat, long, img) VALUES ("Chino Juan", "Chino", "41.413469", "2.188765", "/img/chino_juan.jpg")');
+            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, lat, long, img) VALUES ("Zozan Gourmet", "Turco", "41.398328", "2.205016", "/img/zozan.jpg")');
         }, app.error, app.obtenirItems);
         document.getElementById('accio').value = '';
     },
@@ -57,7 +59,7 @@ var app = {
     },
     obtenirItems: function () {
         db.transaction(function (tx) {
-            tx.executeSql('SELECT * FROM LLISTA', [], app.consultar, app.error);
+            tx.executeSql('SELECT * FROM RESTAURANTS', [], app.consultar, app.error);
         }, app.error);
     },
     consultar: function (tx, resultats) {
@@ -66,7 +68,7 @@ var app = {
         for (var i = 0; i < len; i++) {
             sortida = sortida +
                 '<li id="' + resultats.rows.item(i).id + '">' +
-                resultats.rows.item(i).accio + '</li>';
+                resultats.rows.item(i).nom + '</li>';
         }
         document.getElementById('missatge').innerHTML = '<p>total items:</p>';
         document.getElementById('llista').innerHTML = '<ul>' + sortida + '</ul>';
