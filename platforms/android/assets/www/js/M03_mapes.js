@@ -13,6 +13,20 @@ var watchID = null;
 
 var options = { timeout: 31000, enableHighAccuracy: true, maximumAge: 90000 };
 
+function Restaurant(nom, tipus, latitud, longitud, img) {
+    this.nom = nom;
+    this.tipus = tipus;
+    this.latitud = latitud;
+    this.longitud = longitud;
+    this.img = img;
+
+}
+
+
+var len;
+var marker;
+var rest = [];
+
 var app = {
     // Constructor
     initialize: function() {
@@ -32,10 +46,11 @@ var app = {
 
         db = app.obtenirBaseDades();
         db.transaction(function (tx) {
+            tx.executeSql('DROP TABLE RESTAURANTS');
             tx.executeSql('CREATE TABLE IF NOT EXISTS RESTAURANTS' +
                             '(id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
-                            'nom, tipus, lat, long, img)');
-        }, app.error, app.desar,app.obtenirItems);
+                            'nom, tipus, latitud, longitud, img)');
+        }, app.error, app.desar, app.obtenirBaseDades, app.obtenirItemsMapa);
         //document.getElementById('desa').addEventListener('click', function (e) {
         //    app.desar();
         //});
@@ -48,10 +63,10 @@ var app = {
         //var valor = document.getElementById('accio').value;
         db.transaction(function (tx) {
             tx.executeSql('DELETE FROM RESTAURANTS');
-            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, lat, long, img) VALUES ("Chino Juan", "Chino", "41.413469", "2.188765", "/img/chino_juan.jpg")');
-            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, lat, long, img) VALUES ("Zozan Gourmet", "Turco", "41.398328", "2.205016", "/img/zozan.jpg")');
+            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ("Chino Juan", "Chino", "41.413469", "2.188765", "/img/chino_juan.jpg")');
+            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ("Zozan Gourmet", "Turco", "41.398328", "2.205016", "/img/zozan.jpg")');
         }, app.error, app.obtenirItems);
-        document.getElementById('accio').value = '';
+        //document.getElementById('accio').value = '';
     },
     error: function (error) {
         console.log('error');
@@ -62,16 +77,52 @@ var app = {
             tx.executeSql('SELECT * FROM RESTAURANTS', [], app.consultar, app.error);
         }, app.error);
     },
+
+    obtenirItemsMapa: function () {
+        db.transaction(function (tx) {
+            tx.executeSql('SELECT * FROM RESTAURANTS', [], app.consultarMapa, app.error);
+        }, app.error);
+    },
+
     consultar: function (tx, resultats) {
-        var len = resultats.rows.length;
+        len = resultats.rows.length;
         var sortida = '';
         for (var i = 0; i < len; i++) {
             sortida = sortida +
                 '<li id="' + resultats.rows.item(i).id + '">' +
                 resultats.rows.item(i).nom + '</li>';
+            //var imgSortida = resultats.rows.item(i).img;
         }
-        document.getElementById('missatge').innerHTML = '<p>total items:</p>';
-        document.getElementById('llista').innerHTML = '<ul>' + sortida + '</ul>';
+        //document.getElementById('missatge').innerHTML = '<p>total items:</p>';
+        //document.getElementById('llista').innerHTML = '<ul>' + sortida + '</ul>';
+        //document.getElementById('imagen').innerHTML = '<img src="' + imgSortida + '">';
+
+        //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+        //    Try it Yourself »
+
+    },
+
+
+    consultarMapa: function (tx, resultats) {
+        len = resultats.rows.length;
+        var sortida = '';
+        for (var i = 0; i < len; i++) {
+            sortida = sortida +
+                '<li id="' + resultats.rows.item(i).id + '">' +
+                resultats.rows.item(i).nom + '</li>';
+
+            var r = new Restaurant(resultats.rows.item(i).nom, resultats.rows.item(i).tipus, resultats.rows.item(i).latitud,
+                                    resultats.rows.item(i).longitud, resultats.rows.item(i).img);
+            rest.push(r);
+            console.log(rest[0]);
+            //var imgSortida = resultats.rows.item(i).img;
+        }
+        //document.getElementById('missatge').innerHTML = '<p>total items:</p>';
+        //document.getElementById('llista').innerHTML = '<ul>' + sortida + '</ul>';
+        //document.getElementById('imagen').innerHTML = '<img src="' + imgSortida + '">';
+
+
+
     },
 
 
@@ -88,19 +139,39 @@ var app = {
             center: latLng,
             panControl: false,
             zoomControl: true,
-            zoom: 16,
+            zoom: 12,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         var mapa = new google.maps.Map(
             document.getElementById('mapa'),
             opcionsMapa
         );
-        var marker = new google.maps.Marker({
+        marker = new google.maps.Marker({
             position: latLng,
             map: mapa });
         marker = new google.maps.Marker({
             position:  {lat: 41.409377,lng: 2.190170},
             map: mapa });
+        //app.obtenirItemsMapa();
+
+        console.log(rest);
+        console.log(rest.length);
+        console.log(rest[1]);
+
+
+        rest.forEach( function (arrayItem){
+            var x = arrayItem.latitud;
+            console.log(x);
+        });
+
+        for(var i = 0; i<rest.length; ++i){
+            console.log("hols"+rest[i].latitud);
+            marker = new google.maps.Marker({
+                position:  {lat: rest[i].latitud,lng: rest[i].longitud},
+                map: mapa });
+        }
+
+
 
     },
     //callback per a un cas d'error
