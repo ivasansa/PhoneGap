@@ -4,6 +4,8 @@
 * versió 1.0 24.02.2016
 *
 */
+
+
 var app = {
     // Constructor
     initialize: function() {

@@ -21,12 +21,20 @@ function Restaurant(nom, tipus, latitud, longitud, img) {
     this.img = img;
 
 }
+//
+//function showValue(value){
+//    radius = value;
+//    console.log("radius");
+//
+//}
 
 
+
+var radius = 12;
 var len;
 var marker;
 var rest = [];
-
+var markers = [];
 var app = {
     // Constructor
     initialize: function() {
@@ -63,8 +71,10 @@ var app = {
         //var valor = document.getElementById('accio').value;
         db.transaction(function (tx) {
             tx.executeSql('DELETE FROM RESTAURANTS');
-            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ("Chino Juan", "Chino", "41.413469", "2.188765", "/img/chino_juan.jpg")');
-            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ("Zozan Gourmet", "Turco", "41.398328", "2.205016", "/img/zozan.jpg")');
+            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ' +
+                        '("Chino Juan", "Chino", "41.413469", "2.188765", "img/chino_juan.jpg")');
+            tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ' +
+                        '("Zozan Gourmet", "Turco", "41.398328", "2.205016", "img/zozan.jpg")');
         }, app.error, app.obtenirItemsMapa);
         //document.getElementById('accio').value = '';
     },
@@ -149,6 +159,10 @@ var app = {
         marker = new google.maps.Marker({
             position: latLng,
             map: mapa });
+
+        //mapa.setZoom(radius);
+
+        markers.push(marker);
         //marker = new google.maps.Marker({
         //    position:  {lat: 41.409377,lng: 2.190170},
         //    map: mapa });
@@ -164,16 +178,42 @@ var app = {
         //    console.log(x);
         //});
 
+
+
+
+
         for(var i = 0; i<rest.length; ++i){
             console.log("hols"+rest[i].latitud);
             marker = new google.maps.Marker({
                 position:  {lat: parseFloat(rest[i].latitud),lng: parseFloat(rest[i].longitud)},
-                map: mapa });
+                label:rest[i].nom,
+                map: mapa
+            });
+            //google.maps.event.addListener(marker, 'click', function(){
+            //    console.log(marker.nom);
+            //});
+            markers.push(marker);
+
             console.log(rest[i].latitud);
+
+
+            var img = document.createElement("img");
+            img.src = rest[i].img;
+            console.log(img.src);
+            document.getElementById("llista").appendChild(img);
+
+
         }
 
 
 
+        //google.maps.event.addListener(marker, 'click', (function(marker, i) {
+        //    return function() {
+        //        //infowindow.setContent(markers[i]);
+        //        //infowindow.open(map, marker[i]);
+        //        console.log(markers[i].nom);
+        //    }
+        //})(marker, i));
     },
     //callback per a un cas d'error
     onError: function(error){
