@@ -33,6 +33,8 @@ function Restaurant(nom, tipus, latitud, longitud, img) {
 var radius = 12;
 var len;
 var marker;
+var marker1;
+var i;
 var rest = [];
 var markers = [];
 var app = {
@@ -72,9 +74,9 @@ var app = {
         db.transaction(function (tx) {
             tx.executeSql('DELETE FROM RESTAURANTS');
             tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ' +
-                        '("Chino Juan", "Chino", "41.413469", "2.188765", "/img/chino_juan.jpg")');
+                        '("Chino Juan", "Chino", "41.413469", "2.188765", "img/chino_juan.jpg")');
             tx.executeSql('INSERT INTO RESTAURANTS (nom, tipus, latitud, longitud, img) VALUES ' +
-                        '("Zozan Gourmet", "Turco", "41.398328", "2.205016", "/img/zozan.jpg")');
+                        '("Zozan Gourmet", "Turco", "41.398328", "2.205016", "img/zozan.jpg")');
         }, app.error, app.obtenirItemsMapa);
         //document.getElementById('accio').value = '';
     },
@@ -156,7 +158,9 @@ var app = {
             document.getElementById('mapa'),
             opcionsMapa
         );
-        marker = new google.maps.Marker({
+        var infowindow = new google.maps.InfoWindow();
+
+        marker1 = new google.maps.Marker({
             position: latLng,
             map: mapa });
 
@@ -182,11 +186,13 @@ var app = {
 
 
 
-        for(var i = 0; i<rest.length; ++i){
-            console.log("hols"+rest[i].latitud);
+        for(i = 0; i<rest.length; ++i){
+            //console.log("hols"+rest[i].latitud);
+
             marker = new google.maps.Marker({
                 position:  {lat: parseFloat(rest[i].latitud),lng: parseFloat(rest[i].longitud)},
                 label:rest[i].nom,
+                img:rest[i].img,
                 map: mapa
             });
             //google.maps.event.addListener(marker, 'click', function(){
@@ -197,23 +203,34 @@ var app = {
             console.log(rest[i].latitud);
 
 
-            var img = document.createElement("img");
-            img.src = rest[i].img;
+            //var img = document.createElement("p");
+            //img.src = marker.label;
+            //console.log(img.src);
+            //document.getElementById("llista").appendChild(img);
 
-            document.getElementById("llista").appendChild(img);
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                return function() {
+                    infowindow.setContent(marker.label);
+                    infowindow.open(mapa, marker);
+                    console.log("h");
 
+
+                    var img = document.createElement("img");
+                    img.src = marker.img;
+                    console.log(img.src);
+                    if (document.getElementById("llista").hasChildNodes()) {
+                        document.getElementById("llista").removeChild("img");
+                    }
+                    document.getElementById("llista").appendChild(img);
+
+                }
+            })(marker, i));
 
         }
 
 
 
-        //google.maps.event.addListener(marker, 'click', (function(marker, i) {
-        //    return function() {
-        //        //infowindow.setContent(markers[i]);
-        //        //infowindow.open(map, marker[i]);
-        //        console.log(markers[i].nom);
-        //    }
-        //})(marker, i));
+
     },
     //callback per a un cas d'error
     onError: function(error){
